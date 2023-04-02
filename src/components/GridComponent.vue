@@ -28,8 +28,8 @@
         :key="item.name"
       >
         <td>{{ item.name }}</td>
-        <td>{{ item.height }}</td>
-        <td>{{ item.mass }}</td>
+        <td>{{ getStringValue(item.height) }}</td>
+        <td>{{ getStringValue(item?.mass) }}</td>
         <td>{{ formatDate(item.created) }}</td>
         <td>{{ formatDate(item.edited) }}</td>
         <td>{{ planetsObj[item.homeworld]?.name }}</td>
@@ -89,6 +89,10 @@ function formatDate(dateString) {
 
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   return date.toLocaleDateString('en-US', options);
+}
+
+function getStringValue(value) {
+  return value !== 'unknown' ? value : ' - '
 }
 
 async function getUsers(page) {
