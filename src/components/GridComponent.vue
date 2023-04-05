@@ -8,7 +8,7 @@
     </thead>
     <tbody>
       <tr
-        v-for="item in currentPeople"
+        v-for="item in peopleStore?.currentPeople"
         :key="item.name"
       >
         <td>{{ item.name }}</td>
@@ -29,11 +29,12 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import axios from '@/axios';
 import { getStringValue, formatDate } from '../utils'
 import { usePlanetStore } from '../stores/planetsStore'
+import { usePeopleStore } from '../stores/peopleStore';
 
 const planetStore = usePlanetStore();
+const peopleStore = usePeopleStore();
 let headers = [
   {
     displayName: 'Name'
@@ -57,44 +58,28 @@ let headers = [
 
 let paginationLength = ref(0);
 let currentPage = ref(1);
-let currentPeople = ref([]);
-let pageAndPeople = ref({});
-const itemsPerPage = 10;
 
-watch(currentPage, async (newPage)=> {
-  //if data for the page was exists, load it
-  if(pageAndPeople.value[newPage]) {
-    setPageAndPeople(pageAndPeople.value[newPage], newPage)
-  } else { //else get new data from server
-    let result = await getUsers(newPage);
-    setPageAndPeople(result.data.results, newPage);
-  }
-});
+const itemsPerPage = 10;
 
 onMounted( async () => {
     await planetStore.getAllPlanets();
-    let people = await getUsers();
-    getPaginationLength(people);
-    setPageAndPeople(people.data.results, 1);
+    let result = await peopleStore.getPeoplePerPage();
+    getPaginationLength(result);
+});
+
+watch(currentPage, async (newPage)=> {
+  //if data for the page was exists load it
+  if(peopleStore.pageAndPeople[newPage]) {
+    peopleStore.setPageAndPeople(newPage, peopleStore.pageAndPeople[newPage])
+  } else { //else get new data from server
+      await peopleStore.getPeoplePerPage(newPage);
+  }
 });
 
 function getPaginationLength(result) {
   paginationLength.value = Math.ceil(result.data.count / itemsPerPage);
 }
 
-function setPageAndPeople(peopleData, page) {
-  currentPeople.value =  peopleData; //result.data. results;
-  pageAndPeople.value[page] = currentPeople.value;
-}
-
-async function getUsers(page) {
-  let url = '/people';
-  if (page) {
-    url +=`/?page=${page}`
-  }
-  let result = await axios.get(url);
-  return result;
-}
 
 </script>
 
