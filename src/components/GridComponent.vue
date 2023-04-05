@@ -2,24 +2,8 @@
   <v-table>
     <thead>
       <tr>
-        <th class="text-left">
-          Name
-        </th>
-        <th class="text-left">
-          Height
-        </th>
-        <th class="text-left">
-          Mass
-        </th>
-        <th class="text-left">
-          Created
-        </th>
-        <th class="text-left">
-          Edited
-        </th>
-        <th class="text-left">
-          Planet Name
-        </th>
+        <th v-for="item in headers"
+        :key="item.displayName">{{ item.displayName }}</th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +16,7 @@
         <td>{{ getStringValue(item?.mass) }}</td>
         <td>{{ formatDate(item.created) }}</td>
         <td>{{ formatDate(item.edited) }}</td>
-        <td>{{ planetsObj[item.homeworld]?.name }}</td>
+        <td>{{ getStringValue(planetStore.planetsObj[item.homeworld]?.name) }}</td>
       </tr>
       <tr>
         <td colspan="6">
@@ -46,12 +30,35 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import axios from '@/axios';
+import { getStringValue, formatDate } from '../utils'
+import { usePlanetStore } from '../stores/planetsStore'
+
+const planetStore = usePlanetStore();
+let headers = [
+  {
+    displayName: 'Name'
+  },
+  {
+    displayName: 'Height'
+  },
+  {
+    displayName: 'Mass'
+  },
+  {
+    displayName: 'Created'
+  },
+  {
+    displayName: 'Edited'
+  },
+  {
+    displayName: 'Planet Name'
+  }
+];
 
 let paginationLength = ref(0);
 let currentPage = ref(1);
 let currentPeople = ref([]);
 let pageAndPeople = ref({});
-let planetsObj = ref({});
 const itemsPerPage = 10;
 
 watch(currentPage, async (newPage)=> {
@@ -64,15 +71,11 @@ watch(currentPage, async (newPage)=> {
   }
 });
 
-watch(currentPeople, async (newCurrentPeople) => {
-  getPlanetsForPeople(newCurrentPeople);
-})
-
-
 onMounted( async () => {
-    let result = await getUsers();
-    getPaginationLength(result);
-    setPageAndPeople(result.data.results, 1);
+    await planetStore.getAllPlanets();
+    let people = await getUsers();
+    getPaginationLength(people);
+    setPageAndPeople(people.data.results, 1);
 });
 
 function getPaginationLength(result) {
@@ -84,17 +87,6 @@ function setPageAndPeople(peopleData, page) {
   pageAndPeople.value[page] = currentPeople.value;
 }
 
-function formatDate(dateString) {
-  const date = new Date(dateString);  // Create a new Date object from the string
-
-  const options = { day: 'numeric', month: 'long', year: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
-}
-
-function getStringValue(value) {
-  return value !== 'unknown' ? value : ' - '
-}
-
 async function getUsers(page) {
   let url = '/people';
   if (page) {
@@ -102,20 +94,6 @@ async function getUsers(page) {
   }
   let result = await axios.get(url);
   return result;
-}
-
-function getPlanetsForPeople(peopleData) {
-  let planetsSet = new Set();
-  peopleData.forEach(person => {
-    planetsSet.add(person.homeworld);
-  });
-
-  planetsSet.forEach(async (planet) => {
-    if (!planetsObj.value[planet]) {
-      let planetResult = await axios.get(planet);
-      planetsObj.value[planet] = planetResult.data;
-    }
-  });
 }
 
 </script>
