@@ -1,10 +1,10 @@
 <script setup>
-import GridComponent from '@/components/GridComponent.vue';
+import PeopleTableComponent from '@/components/PeopleTableComponent.vue';
 
 </script>
 
 <template>
   <main>
-    <GridComponent></GridComponent>
+    <PeopleTableComponent></PeopleTableComponent>
   </main>
 </template>

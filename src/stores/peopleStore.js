@@ -5,6 +5,7 @@ import axios from '../axios'
 export const usePeopleStore = defineStore('people', () => {
   let currentPeople = ref([]);
   let pageAndPeople = ref({});
+  let totalPeopleLength = ref(0)
 
   async function getPeoplePerPage(page = 1) {
     let url = '/people/?page=' + page;
@@ -14,9 +15,13 @@ export const usePeopleStore = defineStore('people', () => {
   }
 
   function setPageAndPeople(page, peopleData) {
-    currentPeople.value =  peopleData; //result.data. results;
+    currentPeople.value =  peopleData;
     pageAndPeople.value[page] = currentPeople.value;
   }
 
-  return { currentPeople, pageAndPeople, getPeoplePerPage, setPageAndPeople }
+  function setTotalPeopleLength(length) {
+    totalPeopleLength.value = length;
+  }
+
+  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setPageAndPeople, setTotalPeopleLength }
 })
