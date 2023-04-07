@@ -34,7 +34,7 @@
       </template>
       <tr>
         <td :colspan="headers.length">
-          <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
+          <v-pagination v-model="page" :length="paginationLength"></v-pagination>
         </td>
       </tr>
     </tbody>
@@ -44,24 +44,26 @@
 <script setup>
 import LoadingComponent from './LoadingComponent.vue';
 import { getStringValue, formatDate } from '../../utils'
-import { ref, watch, computed } from 'vue';
+import { computed } from 'vue';
 import { usePeopleStore } from '../../stores/peopleStore';
 
 let peopleStore = usePeopleStore();
-let currentPage = ref(1);
 
-defineProps({
+let props = defineProps({
     headers: { type: Array, required: true },
     data: { type: Array, required: true },
-    isLoading: { type: Boolean, default: false }
+    isLoading: { type: Boolean, default: false },
+    currentPage: { type: Number, default: 1},
 });
+
+const emit = defineEmits(['update:currentPage'])
 
 const itemsPerPage = 10;
-const emit = defineEmits(['pageChanged']);
 
-watch(currentPage, (newPage) => {
-  emit('pageChanged', newPage);
-});
+let page = computed({
+  get: () => props.currentPage,
+  set: (val) => emit('update:currentPage', val)
+})
 
 let paginationLength = computed(() => {
   return Math.ceil(peopleStore.totalPeopleLength / itemsPerPage);

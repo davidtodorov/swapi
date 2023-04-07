@@ -39,3 +39,9 @@ const showDialog = computed({
   }
 })
 </script>
+
+<style lang="css">
+    span {
+        font-weight: bold;
+    }
+</style>

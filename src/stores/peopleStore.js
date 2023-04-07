@@ -15,13 +15,17 @@ export const usePeopleStore = defineStore('people', () => {
   }
 
   function setPageAndPeople(page, peopleData) {
-    currentPeople.value =  peopleData;
+    setCurrentPeople(peopleData)
     pageAndPeople.value[page] = currentPeople.value;
+  }
+
+  function setCurrentPeople(peopleData) {
+    currentPeople.value = peopleData
   }
 
   function setTotalPeopleLength(length) {
     totalPeopleLength.value = length;
   }
 
-  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setPageAndPeople, setTotalPeopleLength }
+  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setPageAndPeople, setTotalPeopleLength, setCurrentPeople }
 })
