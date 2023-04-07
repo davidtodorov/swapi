@@ -19,7 +19,7 @@
         v-for="item in data"
         :key="item.name"
       >
-        <td v-for="column in headers" :key="column.name">
+        <td v-for="column in headers" :key="column.name" @click="column?.onClick(item)">
           <template v-if="column?.formatDate">
             {{ formatDate(item[column.key]) }}
           </template>
@@ -54,18 +54,19 @@ defineProps({
     headers: { type: Array, required: true },
     data: { type: Array, required: true },
     isLoading: { type: Boolean, default: false }
-})
+});
 
 const itemsPerPage = 10;
-const emit = defineEmits(['pageChanged'])
+const emit = defineEmits(['pageChanged']);
 
 watch(currentPage, (newPage) => {
   emit('pageChanged', newPage);
-})
+});
 
 let paginationLength = computed(() => {
   return Math.ceil(peopleStore.totalPeopleLength / itemsPerPage);
-})
+});
+
 </script>
 
 <style lang="">

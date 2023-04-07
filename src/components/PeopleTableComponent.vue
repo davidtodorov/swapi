@@ -5,6 +5,8 @@
     :is-loading="isLoading"
     @page-changed="changePage">
   </TableComponent>
+
+  <PlanetDialog v-model="openPlanetDialog" :planet="selectedPlanet"></PlanetDialog>
 </template>
 
 <script setup>
@@ -13,6 +15,7 @@ import { storeToRefs } from 'pinia'
 import { usePlanetStore } from '../stores/planetsStore'
 import { usePeopleStore } from '../stores/peopleStore';
 import TableComponent from './common/TableComponent.vue';
+import PlanetDialog from './PlanetDialog.vue';
 
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
@@ -44,11 +47,17 @@ const headers = [
   {
     displayName: 'Planet Name',
     key: 'homeworld',
-    formatter: extractPlanetName
+    formatter: extractPlanetName,
+    onClick: (item) => {
+      selectedPlanet.value = planetStore.planetsObj[item.homeworld];
+      openPlanetDialog.value = true;
+    }
   }
 ];
 
 let isLoading = ref(false);
+let selectedPlanet = ref({});
+let openPlanetDialog = ref(false);
 
 onMounted( async () => {
   isLoading.value = true;
