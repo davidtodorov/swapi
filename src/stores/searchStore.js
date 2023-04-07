@@ -8,14 +8,13 @@ export const useSearchStore = defineStore('search', () => {
   const peopleStore = usePeopleStore();
   let searchedValues = ref({});
   let searchText = ref("");
-
-  const debouncSearch = _.debounce(async () => {
-    searchPeoplePerPage(1)
-  }, 200);
+  let totalPeopleLength = ref(0);
 
   function searchPeople(value) {
     searchText.value = value;
-    debouncSearch(value);
+    _.debounce(async () => {
+      await searchPeoplePerPage(1)
+    }, 250)();
   }
 
   async function searchPeoplePerPage(page) {
@@ -25,8 +24,8 @@ export const useSearchStore = defineStore('search', () => {
       searchedValues.value[url] = result.data
     }
     peopleStore.setCurrentPeople(searchedValues.value[url].results)
-    peopleStore.setTotalPeopleLength(searchedValues.value[url].count)
+    totalPeopleLength.value = searchedValues.value[url].count;
   }
 
-  return { searchedValues, searchPeople, searchPeoplePerPage }
+  return { totalPeopleLength, searchedValues, searchPeople, searchPeoplePerPage }
 });

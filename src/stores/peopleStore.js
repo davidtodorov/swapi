@@ -8,24 +8,19 @@ export const usePeopleStore = defineStore('people', () => {
   let totalPeopleLength = ref(0)
 
   async function getPeoplePerPage(page = 1) {
+    let result;
     let url = '/people/?page=' + page;
-    let result = await axios.get(url);
-    setPageAndPeople(page, result.data.results);
-    return result;
-  }
-
-  function setPageAndPeople(page, peopleData) {
-    setCurrentPeople(peopleData)
-    pageAndPeople.value[page] = currentPeople.value;
+    if (!pageAndPeople.value[url]) {
+      result = await axios.get(url);
+      pageAndPeople.value[url] = result.data.results;
+      totalPeopleLength.value = result.data.count;
+    }
+    setCurrentPeople(pageAndPeople.value[url]);
   }
 
   function setCurrentPeople(peopleData) {
     currentPeople.value = peopleData
   }
 
-  function setTotalPeopleLength(length) {
-    totalPeopleLength.value = length;
-  }
-
-  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setPageAndPeople, setTotalPeopleLength, setCurrentPeople }
+  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setCurrentPeople }
 })

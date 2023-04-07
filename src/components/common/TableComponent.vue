@@ -45,15 +45,13 @@
 import LoadingComponent from './LoadingComponent.vue';
 import { getStringValue, formatDate } from '../../utils'
 import { computed } from 'vue';
-import { usePeopleStore } from '../../stores/peopleStore';
-
-let peopleStore = usePeopleStore();
 
 let props = defineProps({
     headers: { type: Array, required: true },
     data: { type: Array, required: true },
     isLoading: { type: Boolean, default: false },
     currentPage: { type: Number, default: 1},
+    totalPeopleLength: { type: Number, default: 0 }
 });
 
 const emit = defineEmits(['update:currentPage'])
@@ -66,7 +64,7 @@ let page = computed({
 })
 
 let paginationLength = computed(() => {
-  return Math.ceil(peopleStore.totalPeopleLength / itemsPerPage);
+  return Math.ceil(props.totalPeopleLength / itemsPerPage);
 });
 
 </script>

@@ -4,6 +4,7 @@
     :headers="headers" 
     :data="currentPeople"
     :is-loading="isLoading"
+    :total-people-length="totalPeopleLength"
     v-model:currentPage="currentPage">
   </TableComponent>
   <PlanetDialog v-model="openPlanetDialog" :planet="selectedPlanet"></PlanetDialog>
@@ -21,8 +22,8 @@ import PlanetDialog from './PlanetDialog.vue';
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
 const searchStore = useSearchStore();
-const { currentPeople, pageAndPeople } = storeToRefs(peopleStore);
-const { getPeoplePerPage, setPageAndPeople, setTotalPeopleLength } = peopleStore;
+const { currentPeople } = storeToRefs(peopleStore);
+const { getPeoplePerPage } = peopleStore;
 const headers = [
   {
     displayName: 'Name',
@@ -68,9 +69,8 @@ let currentPage = ref(1);
 onMounted( async () => {
   isLoading.value = true;
   //await planetStore.getAllPlanets();
-  let result = await getPeoplePerPage(1);
-  totalPeopleLength.value = result.data.count;
-  setTotalPeopleLength(totalPeopleLength.value);
+  await getPeoplePerPage(1);
+  totalPeopleLength.value = peopleStore.totalPeopleLength;
   isLoading.value = false;
 });
 
@@ -83,11 +83,11 @@ watch(searchText, (val) => {
   if (val) {
     isSearchMode = true;
     searchStore.searchPeople(val);
+    totalPeopleLength.value = searchStore.totalPeopleLength;
   } else {
     isSearchMode = false;
-    setTotalPeopleLength(totalPeopleLength.value);
-    loadContent(currentPage.value);
   }
+  loadContent(currentPage.value);
 })
 
 function extractPlanetName(value) {
@@ -96,22 +96,17 @@ function extractPlanetName(value) {
 
 async function loadContent(page){
   if(!isSearchMode) {
-      //if data for the page was exists load it
-      if(pageAndPeople.value[page]) {
-        setPageAndPeople(page, pageAndPeople.value[page])
-      } else { //else get new data from server
-        isLoading.value = true;
-        await getPeoplePerPage(page);
-        isLoading.value = false;
-      }
-    } else {
       isLoading.value = true
-      await searchStore.searchPeoplePerPage(page);
+      await peopleStore.getPeoplePerPage(page);
+      totalPeopleLength.value = peopleStore.totalPeopleLength;
       isLoading.value = false;
+    } else {
+        isLoading.value = true
+        await searchStore.searchPeoplePerPage(page);
+        totalPeopleLength.value = searchStore.totalPeopleLength;
+        isLoading.value = false;
     }
 }
-
-
 </script>
 
 <style>
