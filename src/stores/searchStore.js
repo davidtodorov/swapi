@@ -2,13 +2,12 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as _ from 'lodash'
 import axios from '../axios'
-import { usePeopleStore } from './peopleStore'
 
 export const useSearchStore = defineStore('search', () => {
-  const peopleStore = usePeopleStore();
   let searchedValues = ref({});
   let searchText = ref("");
   let totalPeopleLength = ref(0);
+  let currentPeople = ref([])
 
   function searchPeople(value) {
     searchText.value = value;
@@ -23,9 +22,9 @@ export const useSearchStore = defineStore('search', () => {
       let result = await axios.get(url);
       searchedValues.value[url] = result.data
     }
-    peopleStore.setCurrentPeople(searchedValues.value[url].results)
+    currentPeople.value = searchedValues.value[url].results;
     totalPeopleLength.value = searchedValues.value[url].count;
   }
 
-  return { totalPeopleLength, searchedValues, searchPeople, searchPeoplePerPage }
+  return { currentPeople, totalPeopleLength, searchedValues, searchPeople, searchPeoplePerPage }
 });

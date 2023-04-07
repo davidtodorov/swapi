@@ -2,7 +2,7 @@
   <v-text-field bg-color="rgba(255, 255, 255, 0.7)" variant="outlined" v-model="searchText"></v-text-field>
   <TableComponent ref="tableComponent"
     :headers="headers" 
-    :data="currentPeople"
+    :data="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
     :is-loading="isLoading"
     :total-people-length="totalPeopleLength"
     v-model:currentPage="currentPage">
@@ -12,7 +12,6 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { storeToRefs } from 'pinia'
 import { usePlanetStore } from '../stores/planetsStore'
 import { usePeopleStore } from '../stores/peopleStore';
 import { useSearchStore } from '../stores/searchStore'
@@ -22,7 +21,6 @@ import PlanetDialog from './PlanetDialog.vue';
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
 const searchStore = useSearchStore();
-const { currentPeople } = storeToRefs(peopleStore);
 const { getPeoplePerPage } = peopleStore;
 const headers = [
   {
