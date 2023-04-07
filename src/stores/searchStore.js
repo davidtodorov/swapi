@@ -9,11 +9,13 @@ export const useSearchStore = defineStore('search', () => {
   let totalPeopleLength = ref(0);
   let currentPeople = ref([])
 
+  const debouncSearch = _.debounce(async () => {
+    searchPeoplePerPage(1)
+  }, 300);
+
   function searchPeople(value) {
     searchText.value = value;
-    _.debounce(async () => {
-      await searchPeoplePerPage(1)
-    }, 250)();
+    debouncSearch(value);
   }
 
   async function searchPeoplePerPage(page) {

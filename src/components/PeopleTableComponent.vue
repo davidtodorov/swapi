@@ -4,7 +4,7 @@
     :headers="headers" 
     :data="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
     :is-loading="isLoading"
-    :total-people-length="totalPeopleLength"
+    :total-people-length="isSearchMode ? searchStore.totalPeopleLength : peopleStore.totalPeopleLength"
     v-model:currentPage="currentPage">
   </TableComponent>
   <PlanetDialog v-model="openPlanetDialog" :planet="selectedPlanet"></PlanetDialog>
@@ -81,11 +81,10 @@ watch(searchText, (val) => {
   if (val) {
     isSearchMode = true;
     searchStore.searchPeople(val);
-    totalPeopleLength.value = searchStore.totalPeopleLength;
   } else {
     isSearchMode = false;
+    loadContent(currentPage.value);
   }
-  loadContent(currentPage.value);
 })
 
 function extractPlanetName(value) {
@@ -96,12 +95,10 @@ async function loadContent(page){
   if(!isSearchMode) {
       isLoading.value = true
       await peopleStore.getPeoplePerPage(page);
-      totalPeopleLength.value = peopleStore.totalPeopleLength;
       isLoading.value = false;
     } else {
         isLoading.value = true
         await searchStore.searchPeoplePerPage(page);
-        totalPeopleLength.value = searchStore.totalPeopleLength;
         isLoading.value = false;
     }
 }
