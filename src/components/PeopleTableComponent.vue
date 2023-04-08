@@ -21,7 +21,6 @@ import PlanetDialog from './PlanetDialog.vue';
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
 const searchStore = useSearchStore();
-const { getPeoplePerPage } = peopleStore;
 const headers = [
   {
     displayName: 'Name',
@@ -67,7 +66,7 @@ let currentPage = ref(1);
 onMounted( async () => {
   isLoading.value = true;
   //await planetStore.getAllPlanets();
-  await getPeoplePerPage(1);
+  await peopleStore.getAllPeople();
   totalPeopleLength.value = peopleStore.totalPeopleLength;
   isLoading.value = false;
 });
@@ -76,15 +75,17 @@ watch(currentPage, (newPage) => {
     loadContent(newPage);
 })
 
-watch(searchText, (val) => {
+watch(searchText, async (val) => {
   currentPage.value = 1;
   if (val) {
     isSearchMode = true;
-    searchStore.searchPeople(val);
+      isLoading.value = true;
+      searchStore.searchPeople(val);
+      isLoading.value = false;
   } else {
     isSearchMode = false;
-    loadContent(currentPage.value);
   }
+  loadContent(currentPage.value);
 })
 
 function extractPlanetName(value) {

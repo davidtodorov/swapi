@@ -1,31 +1,26 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import * as _ from 'lodash'
-import axios from '../axios'
+import { usePeopleStore } from './peopleStore';
 
 export const useSearchStore = defineStore('search', () => {
   let searchedValues = ref({});
-  let searchText = ref("");
   let totalPeopleLength = ref(0);
-  let currentPeople = ref([])
+  let currentPeople = ref([]);
+  let result = ref([]);
+  let peopleStore = usePeopleStore()
 
-  const debouncSearch = _.debounce(async () => {
-    searchPeoplePerPage(1)
-  }, 300);
+  async function searchPeople(value) {
+    if(peopleStore.fetchedPeople.length !== peopleStore.totalPeopleLength) {
+      await peopleStore.getAllPeople();
+    }
 
-  function searchPeople(value) {
-    searchText.value = value;
-    debouncSearch(value);
+    result.value = peopleStore.fetchedPeople
+        .filter(person => person.name.toLowerCase().indexOf(value) !== -1);
+    totalPeopleLength.value = result.value.length;
   }
 
   async function searchPeoplePerPage(page) {
-    let url = 'people/?search=' + searchText.value + '&page=' + page;
-    if(!searchedValues.value[url]) {
-      let result = await axios.get(url);
-      searchedValues.value[url] = result.data
-    }
-    currentPeople.value = searchedValues.value[url].results;
-    totalPeopleLength.value = searchedValues.value[url].count;
+    currentPeople.value = result.value.slice((page-1)*10, page*10);
   }
 
   return { currentPeople, totalPeopleLength, searchedValues, searchPeople, searchPeoplePerPage }
