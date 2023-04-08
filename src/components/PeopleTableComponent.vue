@@ -66,9 +66,8 @@ const headers = [
   },
   {
     displayName: 'Planet Name',
-    key: 'homeworld',
+    key: 'homeworldName',
     type: 'text',
-    formatter: extractPlanetName,
     onClick: (item) => {
       selectedPlanet.value = planetStore.planetsObj[item.homeworld];
       openPlanetDialog.value = true;
@@ -88,8 +87,9 @@ let currentPage = ref(1);
 
 onMounted( async () => {
   isLoading.value = true;
-  //await planetStore.getAllPlanets();
+  await planetStore.getAllPlanets();
   await peopleStore.getAllPeople();
+  await peopleStore.getPeoplePerPage(currentPage.value)
   totalPeopleLength.value = peopleStore.totalPeopleLength;
   isLoading.value = false;
 });
@@ -120,10 +120,6 @@ watch(sorted, (newSort) => {
   }
   loadContent(currentPage.value);
 })
-
-function extractPlanetName(value) {
-  return planetStore.planetsObj[value]?.name;
-}
 
 async function loadContent(page){
   if(!isSearchMode) {

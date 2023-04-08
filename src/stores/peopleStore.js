@@ -2,8 +2,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia';
 import axios from '../axios'
 import { getDataPerPage } from '../utils';
+import { usePlanetStore } from './planetsStore';
 
 export const usePeopleStore = defineStore('people', () => {
+  let planetStore = usePlanetStore();
   let currentPeople = ref([]);
   let fetchedPeople = ref([]);
   let totalPeopleLength = ref(0)
@@ -16,15 +18,19 @@ export const usePeopleStore = defineStore('people', () => {
   async function getAllPeople(urlParam) {
     let url = urlParam || 'https://swapi.dev/api/people/?page=1';
     let result = await axios.get(url);
-
     totalPeopleLength.value = result.data.count;
-    fetchedPeople.value.push(...result.data.results);
+    let people = result.data.results.map(person => {
+      return {
+        ...person,
+        homeworldName: planetStore.planetsObj[person.homeworld].name
+      }
+    })
+    fetchedPeople.value.push(...people);
 
     if (result.data.next) {
       let nextUrl = result.data.next;
       await getAllPeople(nextUrl)
     }
-    getPeoplePerPage(1);
     return fetchedPeople.value;
   }
 
