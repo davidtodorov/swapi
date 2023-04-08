@@ -8,3 +8,8 @@ export function formatDate(dateString) {
 export function getStringValue(value) {
     return value !== 'unknown' ? value : ' - '
 }
+
+
+export function getDataPerPage(result, page) {
+    return result.slice((page-1)*10, page*10);
+}

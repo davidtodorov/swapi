@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { usePeopleStore } from './peopleStore';
+import { getDataPerPage } from '../utils';
 
 export const useSearchStore = defineStore('search', () => {
   let searchedValues = ref({});
@@ -10,17 +11,13 @@ export const useSearchStore = defineStore('search', () => {
   let peopleStore = usePeopleStore()
 
   async function searchPeople(value) {
-    if(peopleStore.fetchedPeople.length !== peopleStore.totalPeopleLength) {
-      await peopleStore.getAllPeople();
-    }
-
     result.value = peopleStore.fetchedPeople
         .filter(person => person.name.toLowerCase().indexOf(value) !== -1);
     totalPeopleLength.value = result.value.length;
   }
 
   async function searchPeoplePerPage(page) {
-    currentPeople.value = result.value.slice((page-1)*10, page*10);
+    currentPeople.value =  getDataPerPage(result.value, page);
   }
 
   return { currentPeople, totalPeopleLength, searchedValues, searchPeople, searchPeoplePerPage }
