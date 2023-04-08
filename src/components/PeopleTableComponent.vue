@@ -1,5 +1,19 @@
 <template>
-  <v-text-field bg-color="rgba(255, 255, 255, 0.7)" variant="outlined" v-model="searchText"></v-text-field>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="flex: 1">
+      <v-text-field bg-color="rgba(255, 255, 255, 0.7)" variant="outlined" v-model="searchText"></v-text-field>
+    </div>
+    <div style="width: 300px">
+      <v-select
+        label="SORT BY"
+        :items="[defaultSort, ...headers]"
+        item-title="displayName"
+        item-value="key"
+        variant="solo"
+        v-model="sorted"
+      ></v-select>
+    </div>  
+  </div>
   <TableComponent ref="tableComponent"
     :headers="headers" 
     :data="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
@@ -17,6 +31,7 @@ import { usePeopleStore } from '../stores/peopleStore';
 import { useSearchStore } from '../stores/searchStore'
 import TableComponent from './common/TableComponent.vue';
 import PlanetDialog from './PlanetDialog.vue';
+import { sortData } from '../utils';
 
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
@@ -24,29 +39,35 @@ const searchStore = useSearchStore();
 const headers = [
   {
     displayName: 'Name',
-    key: 'name'
+    key: 'name',
+    type: 'text'
   },
   {
     displayName: 'Height',
-    key: 'height'
+    key: 'height',
+    type: 'number'
   },
   {
     displayName: 'Mass',
-    key: 'mass'
+    key: 'mass',
+    type: 'number'
   },
   {
     displayName: 'Created',
     key: 'created',
-    formatDate: true
+    formatDate: true,
+    type: 'date'
   },
   {
     displayName: 'Edited',
     key: 'edited',
-    formatDate: true
+    formatDate: true,
+    
   },
   {
     displayName: 'Planet Name',
     key: 'homeworld',
+    type: 'text',
     formatter: extractPlanetName,
     onClick: (item) => {
       selectedPlanet.value = planetStore.planetsObj[item.homeworld];
@@ -55,6 +76,8 @@ const headers = [
   }
 ];
 
+let defaultSort = { displayName: 'Default', key: 'url'}
+let sorted = ref(defaultSort);
 let isLoading = ref(false);
 let selectedPlanet = ref({});
 let openPlanetDialog = ref(false);
@@ -84,6 +107,16 @@ watch(searchText, async (val) => {
       isLoading.value = false;
   } else {
     isSearchMode = false;
+  }
+  loadContent(currentPage.value);
+})
+
+watch(sorted, (newSort) => {
+  let type = newSort !== 'url' ? headers.find(x => x.key === newSort).type : 'text';
+  peopleStore.fetchedPeople = sortData(peopleStore.fetchedPeople, newSort, type)
+  currentPage.value = 1;
+  if(isSearchMode) {
+    searchStore.searchPeople(searchText.value);
   }
   loadContent(currentPage.value);
 })
