@@ -6,6 +6,7 @@
     :headers="headers"
     :items="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
     :search="searchText"
+    :loading="true"
     class="elevation-1"
   >
     <template v-slot:item.height="{ item }">
@@ -21,11 +22,12 @@
       <span>{{ formatDate(item.value.edited) }}</span>
     </template>
     <template v-slot:item.homeworld="{ item }">
-      <div>
+      <button class="planet" v-on:click="test(item.value)">
         <span>{{ extractPlanetName(item.value.homeworld) }}</span>
-      </div>
+      </button>
     </template>
   </v-data-table>
+  <PlanetDialog v-model="openPlanetDialog" :planet="selectedPlanet"></PlanetDialog>
 </template>
 
 <script setup>
@@ -34,6 +36,7 @@ import { usePlanetStore } from '../stores/planetsStore'
 import { usePeopleStore } from '../stores/peopleStore';
 import { useSearchStore } from '../stores/searchStore'
 import { formatDate, getStringValue } from '../utils';
+import PlanetDialog from './PlanetDialog.vue'
 
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
@@ -83,7 +86,7 @@ let isSearchMode = false;
 onMounted( async () => {
   isLoading.value = true;
   await peopleStore.getAllPeople();
-  //await planetStore.getAllPlanets();
+  await planetStore.getAllPlanets();
   isLoading.value = false;
 });
 
@@ -99,6 +102,15 @@ function extractPlanetName(value) {
   return getStringValue(planetStore.planetsObj[value]?.name);
 }
 
+function test(item) {
+  selectedPlanet.value = planetStore.planetsObj[item.homeworld];
+  openPlanetDialog.value = true;
+}
+
 </script>
 <style>
+.planet {
+  height: 100%;
+  width: 100%;
+}
 </style>

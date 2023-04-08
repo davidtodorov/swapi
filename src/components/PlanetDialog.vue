@@ -40,7 +40,7 @@ const showDialog = computed({
 })
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
     span {
         font-weight: bold;
     }
