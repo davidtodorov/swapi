@@ -7,20 +7,23 @@ export const usePeopleStore = defineStore('people', () => {
   let pageAndPeople = ref({});
   let totalPeopleLength = ref(0)
 
-  async function getPeoplePerPage(page = 1) {
-    let result;
-    let url = '/people/?page=' + page;
-    if (!pageAndPeople.value[url]) {
-      result = await axios.get(url);
-      pageAndPeople.value[url] = result.data.results;
-      totalPeopleLength.value = result.data.count;
+  async function getPeople(planetUrl){
+    let res = await axios.get(planetUrl);
+    if (res) {
+      res.data.results.forEach((planet) => {
+        currentPeople.value.push(planet);
+      });
+  
+      if(res.data.next) {
+        const url = res.data.next;
+        await getPeople(url);
+      }
     }
-    setCurrentPeople(pageAndPeople.value[url]);
   }
 
-  function setCurrentPeople(peopleData) {
-    currentPeople.value = peopleData
+  async function getAllPeople() {
+    await getPeople('/people')
   }
 
-  return { currentPeople, pageAndPeople, totalPeopleLength, getPeoplePerPage, setCurrentPeople }
+  return { currentPeople, pageAndPeople, totalPeopleLength, getAllPeople }
 })

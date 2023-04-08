@@ -8,14 +8,18 @@ import '@mdi/font/css/materialdesignicons.css'
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
+import * as labs from 'vuetify/labs/components'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import './assets/main.css'
 
 const vuetify = createVuetify({
-  components,
-  directives
+  components: {
+    ...labs,
+    ...components,
+    directives
+  }
 })
 
 const app = createApp(App)

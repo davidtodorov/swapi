@@ -1,52 +1,70 @@
 <template>
   <v-text-field bg-color="rgba(255, 255, 255, 0.7)" variant="outlined" v-model="searchText"></v-text-field>
-  <TableComponent ref="tableComponent"
-    :headers="headers" 
-    :data="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
-    :is-loading="isLoading"
-    :total-people-length="isSearchMode ? searchStore.totalPeopleLength : peopleStore.totalPeopleLength"
-    v-model:currentPage="currentPage">
-  </TableComponent>
-  <PlanetDialog v-model="openPlanetDialog" :planet="selectedPlanet"></PlanetDialog>
+  <v-data-table
+    :custom-filter="searchByName"
+    :items-per-page="10"
+    :headers="headers"
+    :items="isSearchMode ? searchStore.currentPeople : peopleStore.currentPeople"
+    :search="searchText"
+    class="elevation-1"
+  >
+    <template v-slot:item.height="{ item }">
+      <span>{{ getStringValue(item.value.height) }}</span>
+    </template>
+    <template v-slot:item.mass="{ item }">
+      <span>{{ getStringValue(item.value.mass) }}</span>
+    </template>
+    <template v-slot:item.created="{ item }">
+      <span>{{ formatDate(item.value.created) }}</span>
+    </template>
+    <template v-slot:item.edited="{ item }">
+      <span>{{ formatDate(item.value.edited) }}</span>
+    </template>
+    <template v-slot:item.homeworld="{ item }">
+      <div>
+        <span>{{ extractPlanetName(item.value.homeworld) }}</span>
+      </div>
+    </template>
+  </v-data-table>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { usePlanetStore } from '../stores/planetsStore'
 import { usePeopleStore } from '../stores/peopleStore';
 import { useSearchStore } from '../stores/searchStore'
-import TableComponent from './common/TableComponent.vue';
-import PlanetDialog from './PlanetDialog.vue';
+import { formatDate, getStringValue } from '../utils';
 
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();
 const searchStore = useSearchStore();
-const { getPeoplePerPage } = peopleStore;
 const headers = [
   {
-    displayName: 'Name',
+    title: 'Name',
     key: 'name'
   },
   {
-    displayName: 'Height',
-    key: 'height'
+    title: 'Height',
+    key: 'height',
+    formatter: getStringValue
   },
   {
-    displayName: 'Mass',
-    key: 'mass'
+    title: 'Mass',
+    key: 'mass',
+    formatter: getStringValue
   },
   {
-    displayName: 'Created',
+    title: 'Created',
     key: 'created',
-    formatDate: true
+    formatter: formatDate
   },
   {
-    displayName: 'Edited',
+    title: 'Edited',
     key: 'edited',
-    formatDate: true
+    formatter: formatDate
   },
   {
-    displayName: 'Planet Name',
+    title: 'Planet Name',
     key: 'homeworld',
     formatter: extractPlanetName,
     onClick: (item) => {
@@ -60,49 +78,27 @@ let isLoading = ref(false);
 let selectedPlanet = ref({});
 let openPlanetDialog = ref(false);
 let searchText = ref("");
-let totalPeopleLength = ref(0);
 let isSearchMode = false;
-let currentPage = ref(1);
 
 onMounted( async () => {
   isLoading.value = true;
+  await peopleStore.getAllPeople();
   //await planetStore.getAllPlanets();
-  await getPeoplePerPage(1);
-  totalPeopleLength.value = peopleStore.totalPeopleLength;
   isLoading.value = false;
 });
 
-watch(currentPage, (newPage) => {
-    loadContent(newPage);
-})
-
-watch(searchText, (val) => {
-  currentPage.value = 1;
-  if (val) {
-    isSearchMode = true;
-    searchStore.searchPeople(val);
-  } else {
-    isSearchMode = false;
-    loadContent(currentPage.value);
-  }
-})
+function searchByName(value, query, item) {
+  return value != null &&
+          query != null &&
+          typeof value === 'string' &&
+          item.columns.name.toLocaleLowerCase().indexOf(query) !== -1
+  
+}
 
 function extractPlanetName(value) {
-  return planetStore.planetsObj[value]?.name;
+  return getStringValue(planetStore.planetsObj[value]?.name);
 }
 
-async function loadContent(page){
-  if(!isSearchMode) {
-      isLoading.value = true
-      await peopleStore.getPeoplePerPage(page);
-      isLoading.value = false;
-    } else {
-        isLoading.value = true
-        await searchStore.searchPeoplePerPage(page);
-        isLoading.value = false;
-    }
-}
 </script>
-
 <style>
 </style>
