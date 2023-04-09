@@ -13,8 +13,8 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { usePeopleStore } from '../stores/peopleStore';
-import { sortData } from '../utils';
+import { usePeopleStore } from '../../stores/peopleStore';
+import { sortData } from '../../utils';
 let defaultSort = { displayName: 'Default', key: 'url'}
 let sorted = ref(defaultSort);
 const peopleStore = usePeopleStore();

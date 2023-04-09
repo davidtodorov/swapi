@@ -6,7 +6,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { useSearchStore } from '../stores/searchStore';
+import { useSearchStore } from '../../stores/searchStore';
 const searchStore = useSearchStore();
 let searchText = ref("");
 const emit = defineEmits(['searchUpdate'])

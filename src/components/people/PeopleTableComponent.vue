@@ -11,11 +11,11 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { usePlanetStore } from '../stores/planetsStore'
-import { usePeopleStore } from '../stores/peopleStore';
-import { useSearchStore } from '../stores/searchStore'
-import TableComponent from './common/TableComponent.vue';
-import PlanetDialog from './PlanetDialog.vue';
+import { usePlanetStore } from '../../stores/planetsStore'
+import { usePeopleStore } from '../../stores/peopleStore';
+import { useSearchStore } from '../../stores/searchStore'
+import TableComponent from '../common/TableComponent.vue';
+import PlanetDialog from '../planets/PlanetDialog.vue';
 
 const planetStore = usePlanetStore();
 const peopleStore = usePeopleStore();

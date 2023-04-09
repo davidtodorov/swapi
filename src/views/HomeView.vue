@@ -12,12 +12,12 @@
 </template>
 
 <script setup>
-import PeopleTableComponent from '../components/PeopleTableComponent.vue';
-import PeopleSearchComponent from '../components/PeopleSearchComponent.vue';
+import PeopleTableComponent from '../components/people/PeopleTableComponent.vue';
+import PeopleSearchComponent from '../components/people/PeopleSearchComponent.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useSearchStore } from '../stores/searchStore';
 import { usePeopleStore } from '../stores/peopleStore';
-import PeopleSortComponent from '../components/PeopleSortComponent.vue';
+import PeopleSortComponent from '../components/people/PeopleSortComponent.vue';
 
 const searchStore = useSearchStore();
 const peopleStore = usePeopleStore();
