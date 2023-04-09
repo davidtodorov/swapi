@@ -38,5 +38,5 @@ export const usePeopleStore = defineStore('people', () => {
     currentPeople.value = peopleData
   }
 
-  return { currentPeople, fetchedPeople, totalPeopleLength, getPeoplePerPage, setCurrentPeople, getAllPeople }
+  return {currentPeople, fetchedPeople, totalPeopleLength, getPeoplePerPage, setCurrentPeople, getAllPeople }
 })
