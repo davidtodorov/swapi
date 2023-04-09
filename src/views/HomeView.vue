@@ -2,7 +2,7 @@
   <main>
     <div class="search-sort-container">
       <PeopleSearchComponent class="search" @searchUpdate="onSearchUpdate()"></PeopleSearchComponent>
-      <PeopleSortComponent class="sort" :data="sortData" @sortUpdate="onSortUpdate()"></PeopleSortComponent>
+      <PeopleSortComponent class="sort" :data="sortKeys" @sortUpdate="onSortUpdate()"></PeopleSortComponent>
     </div>
     <PeopleTableComponent
       ref="peopleTableComponent"
@@ -14,7 +14,7 @@
 <script setup>
 import PeopleTableComponent from '../components/PeopleTableComponent.vue';
 import PeopleSearchComponent from '../components/PeopleSearchComponent.vue';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useSearchStore } from '../stores/searchStore';
 import { usePeopleStore } from '../stores/peopleStore';
 import PeopleSortComponent from '../components/PeopleSortComponent.vue';
@@ -27,6 +27,10 @@ let sortData = ref([]);
 
 onMounted(() => {
   sortData.value = peopleTableComponent.value.headers;
+})
+
+let sortKeys = computed(() => {
+  return peopleTableComponent.value?.headers || [];
 })
 
 watch(currentPage, (newPage) => {
