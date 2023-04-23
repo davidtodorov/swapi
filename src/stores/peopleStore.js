@@ -10,7 +10,7 @@ export const usePeopleStore = defineStore('people', () => {
   let fetchedPeople = ref([]);
   let totalPeopleLength = ref(0)
 
-  async function getPeoplePerPage(page = 1) {
+  function getPeoplePerPage(page = 1) {
     const data = getDataPerPage(fetchedPeople.value, page)
     setCurrentPeople(data);
   }

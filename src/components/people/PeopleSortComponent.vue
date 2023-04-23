@@ -15,7 +15,7 @@
 import { computed, ref, watch } from 'vue';
 import { usePeopleStore } from '../../stores/peopleStore';
 import { sortData } from '../../utils';
-let defaultSort = { displayName: 'Default', key: 'url'}
+let defaultSort = { displayName: 'Default', key: 'url', type: 'text'}
 let sorted = ref(defaultSort);
 const peopleStore = usePeopleStore();
 const emit = defineEmits(['sortUpdate'])
@@ -29,7 +29,7 @@ const props = defineProps({
 })
 
 watch(sorted, (newSort) => {
-  let type = newSort !== 'url' ? items.value.find(x => x.key === newSort).type : 'text';
+  let type = items.value.find(x => x.key === newSort).type;
   peopleStore.fetchedPeople = sortData(peopleStore.fetchedPeople, newSort, type);
   emit('sortUpdate');
 })

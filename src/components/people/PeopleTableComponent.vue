@@ -62,14 +62,13 @@ const headers = [
 let isLoading = ref(false);
 let selectedPlanet = ref({});
 let openPlanetDialog = ref(false);
-let currentPage = ref(1);
 let page = computed({
   get: () => props.currentPage,
   set: (val) => emit('update:currentPage', val)
 })
 
 const props = defineProps({
-    currentPage: { type: Number },
+    currentPage: { type: Number, default: 1 },
 });
 const emit = defineEmits(['update:currentPage'])
 defineExpose({headers});
@@ -78,7 +77,7 @@ onMounted( async () => {
   isLoading.value = true;
   await planetStore.getAllPlanets();
   await peopleStore.getAllPeople();
-  await peopleStore.getPeoplePerPage(currentPage.value)
+  peopleStore.getPeoplePerPage(props.currentPage);
   isLoading.value = false;
 });
 
